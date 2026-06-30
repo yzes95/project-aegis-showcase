@@ -159,10 +159,10 @@ gantt
     axisFormat  %b %Y
 
     section Phase 1
-    UI/UX Prototype (React Native)     :done, p1, 2024-09, 2025-03
+    UI/UX Prototype (React Native)     :done, p1, 2025-09, 2025-11
 
     section Phase 2
-    Native Detection Engine (Kotlin + TFLite)   :done, p2, 2025-03, 2026-06
+    Native Detection Engine (Kotlin + TFLite)   :done, p2, 2025-11, 2026-06
 
     section Phase 3
     Self-Defense + Backend (FastAPI)   :active, p3, 2026-06, 2026-09
