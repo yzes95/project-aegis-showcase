@@ -85,12 +85,106 @@ Aegis combines a **React Native frontend UI** with a **Kotlin native Android eng
 
 ## 🏗️ System Architecture
 
-The Aegis system architecture represents a hybrid mobile-and-backend footprint. The native Android layer uses low-latency local resources for real-time monitoring and blocking, while the FastAPI backend handles non-sensitive user metadata, session coordination, and configuration syncing.
+The Aegis system architecture represents a hybrid client-server model. The client-side Android layer performs real-time, low-latency, privacy-safe content analysis, while the backend coordinates configuration, user stats, and accountability features.
 
-### System Architecture Diagram
-<p align="center">
-  <img src="assets/architecture-diagram.png" width="1000" alt="Aegis System Architecture Diagram" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
-</p>
+### High-Level System Architecture Diagram
+The following diagram highlights the system boundaries, containerized environments, database storage, external API dependencies, and the DevOps pipeline:
+
+```mermaid
+flowchart TB
+    %% Styling Definition
+    classDef device fill:#1c1c1e,stroke:#30d158,stroke-width:2px,color:#ffffff;
+    classDef ui fill:#2c2c2e,stroke:#0a84ff,stroke-width:1.5px,color:#ffffff;
+    classDef native fill:#2c2c2e,stroke:#30d158,stroke-width:1.5px,color:#ffffff;
+    classDef ai fill:#1c1c1e,stroke:#bf5af2,stroke-width:2px,color:#ffffff;
+    classDef backend fill:#2c2c2e,stroke:#ff9f0a,stroke-width:1.5px,color:#ffffff;
+    classDef db fill:#1c1c12,stroke:#ff453a,stroke-width:2px,color:#ffffff;
+    classDef external fill:#121214,stroke:#64748b,stroke-width:1.5px,color:#ffffff;
+    classDef pipeline fill:#121214,stroke:#14b8a6,stroke-width:1.5px,color:#ffffff;
+
+    %% Subgraphs
+    subgraph Client ["📱 Android Client Device"]
+        subgraph UI ["UI Layer (React Native)"]
+            R_Auth["Authentication Screens"]:::ui
+            R_Dash["Challenge & Progress Dashboard"]:::ui
+            R_Settings["Settings Screen"]:::ui
+        end
+
+        subgraph Kotlin ["Native Android Layer (Kotlin)"]
+            K_Access["Accessibility Service"]:::native
+            K_Router["Event Router"]:::native
+            K_Capture["Screen Capture Module"]:::native
+            K_Scanner["URL Scanner"]:::native
+            K_Admin["Device Policy Manager<br/>(Device Admin API)"]:::native
+            K_Block["Native Block Engine"]:::native
+            K_Detect["Browser Detection"]:::native
+        end
+
+        subgraph AI_Engine ["AI Detection Layer (On-Device ML)"]
+            TFLite["TensorFlow Lite model<br/>(Local Image Classifier)"]:::ai
+            AI_Eval["AI Score Evaluator"]:::ai
+            AI_Decision{"Decision Engine<br/>Threshold Check"}:::ai
+        end
+    end
+
+    subgraph Backend_Env ["☁️ Cloud Backend (Docker Container)"]
+        subgraph FastAPI ["FastAPI Application Services"]
+            B_Auth["Auth Service<br/>(Google OAuth + JWT)"]:::backend
+            B_User["User Service"]:::backend
+            B_Challenge["Challenge State Service"]:::backend
+            B_Progress["Progress & Streak Service"]:::backend
+            B_Analytics["Analytics Service"]:::backend
+        end
+
+        subgraph Database_Layer ["Database Layer"]
+            Postgres[("PostgreSQL Database")]:::db
+        end
+    end
+
+    subgraph Ext_Services ["🔌 External Services"]
+        Ext_Google["Google OAuth API"]:::external
+        Ext_Firebase["Firebase Cloud Messaging<br/>(Notifications)"]:::external
+        Ext_Gemini["Gemini API<br/>(AI Coach)"]:::external
+    end
+
+    subgraph CI_CD ["⚙️ DevOps Pipeline"]
+        GA_Pipeline["GitHub Actions CI/CD"]:::pipeline
+    end
+
+    %% Internal Client Flow
+    R_Settings -->|Config Updates| K_Router
+    R_Auth -->|Google SignIn Trigger| K_Router
+    
+    K_Access -->|Window/Package Change| K_Router
+    K_Router -->|Package Info| K_Detect
+    K_Router -->|Active Text/URLs| K_Scanner
+    K_Router -->|Timer Pulse| K_Capture
+    
+    K_Capture -->|Screenshot Bitmaps| TFLite
+    TFLite -->|Classification Output| AI_Eval
+    AI_Eval -->|NSFW Confidence Score| AI_Decision
+    
+    AI_Decision -->|Score > Threshold| K_Block
+    AI_Decision -->|Score < Threshold| K_Capture
+    K_Scanner -->|Nuclear Keyword Match| K_Block
+    K_Detect -->|Bypass Attempt| K_Admin
+    
+    K_Block -->|Redirect to about:blank / Force Close| UI
+    K_Admin -->|Block Settings / Settings Redirection| UI
+
+    %% Client-Backend Flow
+    UI <==>|HTTPS REST API + JWT Token| FastAPI
+    FastAPI <--->|SQL Queries / CRUD| Postgres
+
+    %% Backend-External Flow
+    B_Auth <--->|Verify Tokens| Ext_Google
+    B_Analytics -.->|Send Tokens/Logs| Ext_Firebase
+    B_Challenge <--->|Habit Advice Requests| Ext_Gemini
+
+    %% CI/CD flow
+    GA_Pipeline -.->|Build & Test Client Code| Client
+    GA_Pipeline -.->|Deploy Containerized API| Backend_Env
+```
 
 ---
 
