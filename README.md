@@ -21,6 +21,7 @@
 * [💡 The Solution](#-the-solution)
 * [📱 App UI Showcase](#-app-ui-showcase)
 * [🏗️ System Architecture](#%EF%B8%8F-system-architecture)
+* [🧠 What I Learned](#-what-i-learned)
 * [⚙️ Technical Highlights](#%EF%B8%8F-technical-highlights)
 * [🧪 Testing & TDD Strategy](#-testing--tdd-strategy)
 * [🔄 SDLC — Development Lifecycle](#-sdlc--development-lifecycle)
@@ -91,53 +92,18 @@ The Aegis system architecture represents a hybrid mobile-and-backend footprint. 
   <img src="assets/architecture-diagram.png" width="1000" alt="Aegis System Architecture Diagram" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
 </p>
 
-### Runtime Data Flow
-The following diagram shows how the React Native UI, native Kotlin services, TensorFlow Lite classifier, and FastAPI backend coordinate during runtime:
+---
 
-```mermaid
-graph TD
-    %% Styling Definition
-    classDef device fill:#1c1c1e,stroke:#30d158,stroke-width:2px,color:#ffffff;
-    classDef service fill:#2c2c2e,stroke:#0a84ff,stroke-width:1.5px,color:#ffffff;
-    classDef ai fill:#3a225c,stroke:#bf5af2,stroke-width:1.5px,color:#ffffff;
-    classDef backend fill:#2c2c2e,stroke:#ff9f0a,stroke-width:1.5px,color:#ffffff;
-    classDef db fill:#1c1c12,stroke:#ff453a,stroke-width:2px,color:#ffffff;
+## 🧠 What I Learned
 
-    %% Nodes configuration
-    subgraph Client ["📱 Android Device (Kotlin Client)"]
-        UI["React Native UI Layer<br/>(Dashboard & Onboarding)"]:::device
-        
-        subgraph NativeService ["🛡️ Native Aegis Engine"]
-            Watchdog["Accessibility Service<br/>(Observes UI Nodes & Window Events)"]:::service
-            Filter["Aegis Detection Service<br/>(Background Screenshotter)"]:::service
-            Slicer["8-Region Multi-Crop Slicer"]:::ai
-            TFLite["TensorFlow Lite Engine<br/>(On-device Image Classifier)"]:::ai
-            Enforcer["Shield Enforcement Layer<br/>(Back-Tap / Redirect Handler)"]:::service
-            SelfDefense["Self-Defense Controller<br/>(Settings Screen Interceptor)"]:::service
-        end
-    end
+Transitioning Aegis from a local prototype to a secure, production-ready system taught me critical lessons about mobile architecture, API design, security, and integration:
 
-    subgraph Cloud ["☁️ AWS Cloud Backend"]
-        API["FastAPI Web API Gateway<br/>(JWT Verification & Data Validation)"]:::backend
-        OAuth["Google OAuth Service"]:::backend
-        DB[("PostgreSQL Database<br/>(Accounts, Sessions, Violation Logs)")]:::db
-    end
-
-    %% Flow lines
-    UI -.->|Configures| Watchdog
-    Watchdog -->|Triggers Screen Capture| Filter
-    Filter -->|Extracts Frame| Slicer
-    Slicer -->|Sends 8 Crops| TFLite
-    TFLite -->|Returns NSFW Score| Enforcer
-    Watchdog -->|Detects Settings Bypass| SelfDefense
-    
-    SelfDefense -->|Injects Back-Taps / Silently Redirects| UI
-    Enforcer -->|Injects about:blank & Sends Home| UI
-    
-    UI <===>|HTTPS REST + JWT Auth| API
-    API <--->|Validates Auth| OAuth
-    API <--->|CRUD Operations| DB
-```
+* **Token Storage & Security:** Understood the risks of storing short-lived access tokens on disk. Designed a hybrid storage system: caching the long-lived refresh token in the secure hardware storage (Keychain/Keystore) while holding the access token in active device memory.
+* **Production Auth Flow UX:** Moved from an amateur registration auto-login to a multi-stage, recruiter-grade authentication stack (Landing $\rightarrow$ Sign-Up $\rightarrow$ Verification $\rightarrow$ Sign-In). Handled React Native navigation states to persist user data (like email autofill) during backward navigation.
+* **On-Device AI vs. Cloud Latency:** Experimented with TensorFlow Lite local inference, learning how to partition mobile screen real-estate (8-region multi-crop) to balance detection speed, model footprint, and user privacy.
+* **Third-Party Integrations (Resend vs. SMTP/Formspree):** Evaluated communication paths for transactional emails. Learned the difference between a form handler (Formspree) and a dedicated email delivery API (Resend), choosing API-driven delivery to reduce transport configuration overhead.
+* **Database Security (Credential Hashing):** Implemented verification code hashing inside the PostgreSQL database using FastAPI. Storing hashes instead of plaintext prevents credential theft if the database is compromised.
+* **Gradle Configuration & Environment Sharing:** Solved the environment variables discrepancy between Python and React Native by building a shared `.env` structure accessed by Android Gradle relative paths via `react-native-config`.
 
 ---
 
