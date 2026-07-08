@@ -110,30 +110,26 @@ flowchart TB
             R_Settings["Settings Screen"]:::ui
         end
 
-        subgraph Kotlin ["Native Android Layer (Kotlin)"]
+        subgraph Kotlin ["Native Android Layer (Kotlin Engine)"]
             K_Access["Accessibility Service"]:::native
-            K_Router["Event Router"]:::native
             K_Capture["Screen Capture Module"]:::native
-            K_Scanner["URL Scanner"]:::native
+            K_Scanner["URL/Text Scanner"]:::native
             K_Admin["Device Policy Manager<br/>(Device Admin API)"]:::native
-            K_Block["Native Block Engine"]:::native
-            K_Detect["Browser Detection"]:::native
+            K_Block["Native App Suspension Engine"]:::native
         end
 
         subgraph AI_Engine ["AI Detection Layer (On-Device ML)"]
-            TFLite["TensorFlow Lite model<br/>(Local Image Classifier)"]:::ai
-            AI_Eval["AI Score Evaluator"]:::ai
-            AI_Decision{"Decision Engine<br/>Threshold Check"}:::ai
+            TFLite["TensorFlow Lite Engine<br/>(Local Image Classifier)"]:::ai
         end
     end
 
     subgraph Backend_Env ["☁️ Cloud Backend (Docker Container)"]
-        subgraph FastAPI ["FastAPI Application Services"]
+        subgraph FastAPI ["FastAPI Application Server"]
             B_Auth["Auth Service<br/>(Google OAuth + JWT)"]:::backend
             B_User["User Service"]:::backend
             B_Challenge["Challenge State Service"]:::backend
             B_Progress["Progress & Streak Service"]:::backend
-            B_Email["Email Service<br/>(Resend API Caller)"]:::backend
+            B_Email["Email Service (Resend API)"]:::backend
         end
 
         subgraph Database_Layer ["Database Layer"]
@@ -144,46 +140,27 @@ flowchart TB
     subgraph Ext_Services ["🔌 External Services"]
         Ext_Google["Google OAuth API"]:::external
         Ext_Resend["Resend Email API"]:::external
-        Ext_Gemini["Gemini API<br/>(AI Coach)"]:::external
+        Ext_Gemini["Gemini API (AI Coach)"]:::external
     end
 
     subgraph CI_CD ["⚙️ DevOps Pipeline"]
         GA_Pipeline["GitHub Actions CI/CD"]:::pipeline
     end
 
-    %% Internal Client Flow
-    R_Settings -->|Config Updates| K_Router
-    R_Auth -->|Google SignIn Trigger| K_Router
-    
-    K_Access -->|Window/Package Change| K_Router
-    K_Router -->|Package Info| K_Detect
-    K_Router -->|Active Text/URLs| K_Scanner
-    K_Router -->|Timer Pulse| K_Capture
-    
-    K_Capture -->|Screenshot Bitmaps| TFLite
-    TFLite -->|Classification Output| AI_Eval
-    AI_Eval -->|NSFW Confidence Score| AI_Decision
-    
-    AI_Decision -->|Score > Threshold| K_Block
-    AI_Decision -->|Score < Threshold| K_Capture
-    K_Scanner -->|Nuclear Keyword Match| K_Block
-    K_Detect -->|Bypass Attempt| K_Admin
-    
-    K_Block -->|Redirect to about:blank / Force Close| UI
-    K_Admin -->|Block Settings / Settings Redirection| UI
+    %% Structural Communication & Interfaces
+    UI <==>|React Native Native Module Bridge| Kotlin
+    Kotlin ===>|JNI / Local Inference Call| AI_Engine
+    UI <==>|HTTPS REST API + JWT Bearer Auth| FastAPI
+    FastAPI <==>|SQLAlchemy SQL Connection| Postgres
 
-    %% Client-Backend Flow
-    UI <==>|HTTPS REST API + JWT Token| FastAPI
-    FastAPI <--->|SQL Queries / CRUD| Postgres
+    %% External Interface Connections
+    B_Auth <--->|HTTPS Token Validation| Ext_Google
+    B_Email -.->|HTTPS Email Delivery| Ext_Resend
+    B_Challenge <--->|HTTPS NLP Queries| Ext_Gemini
 
-    %% Backend-External Flow
-    B_Auth <--->|Verify Tokens| Ext_Google
-    B_Email -.->|Send Verification Mail| Ext_Resend
-    B_Challenge <--->|Habit Advice Requests| Ext_Gemini
-
-    %% CI/CD flow
-    GA_Pipeline -.->|Build & Test Client Code| Client
-    GA_Pipeline -.->|Deploy Containerized API| Backend_Env
+    %% CI/CD build & deployment boundaries
+    GA_Pipeline -.->|Build & Verify Native Binaries| Client
+    GA_Pipeline -.->|Deploy Containerized API Image| Backend_Env
 ```
 
 ---
