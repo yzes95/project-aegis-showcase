@@ -148,6 +148,15 @@ Without protection, this caused Chrome to open **3–4 redundant `about:blank` t
 
 ---
 
+## 🧪 Testing & TDD Strategy
+To ensure absolute reliability and maintain high standards of code quality, Aegis implements a multi-layered testing strategy across both its frontend and backend components:
+
+* **Backend Unit & Integration Testing (Pytest):** Following Test-Driven Development (TDD) principles, we write assertions first to verify password hashing, token validation rules, challenge state logic, and API routes before writing implementation endpoints.
+* **Frontend Unit Testing (Jest & React Native Testing Library):** Focuses on isolating and testing asynchronous storage helpers, custom hooks, and utility components.
+* **System & Device Verification (Manual/Logcat):** End-to-end user flows (such as Accessibility Service node capturing and TensorFlow Lite classification) are systematically validated using specialized device scripts and real-time Android logcat analysis.
+
+---
+
 ## 🔄 SDLC — Development Lifecycle
 
 This project follows an **Iterative & Incremental** SDLC model. Each phase delivers a fully working, testable increment that builds on the previous one.
