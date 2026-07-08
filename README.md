@@ -14,6 +14,23 @@
 
 ---
 
+## 📖 Table of Contents
+* [📌 Project Overview](#-project-overview)
+* [🧠 Context & Motivation](#-context--motivation)
+* [🎯 What Problem It Solves](#-what-problem-it-solves)
+* [💡 The Solution](#-the-solution)
+* [📱 App UI Showcase](#-app-ui-showcase)
+* [🏗️ System Architecture](#%EF%B8%8F-system-architecture)
+* [⚙️ Technical Highlights](#%EF%B8%8F-technical-highlights)
+* [🧪 Testing & TDD Strategy](#-testing--tdd-strategy)
+* [🔄 SDLC — Development Lifecycle](#-sdlc--development-lifecycle)
+* [📊 Commit Highlights](#-commit-highlights)
+* [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
+* [📁 Repository & Project Board Structure](#-repository--project-board-structure)
+* [👤 About the Developer](#-about-the-developer)
+
+---
+
 ## 📌 Project Overview
 
 Aegis: Digital Shield is a **high-commitment Android accountability application** built for users who want real, inescapable control over their digital habits. Unlike simple blocklists or browser filters that can be disabled in seconds, Aegis is designed to be **resilient by architecture** — it fights back.
@@ -28,63 +45,98 @@ Aegis: Digital Shield is a **high-commitment Android accountability application*
 
 ---
 
-## 🚦 Current Status
+## 🧠 Context & Motivation
 
-| Phase | Name | Status |
-|---|---|---|
-| 1 | UI/UX Prototype | ✅ Complete |
-| 2 | Native Engine & Detection | ✅ Complete |
-| 3 | Self-Defense & Backend | 🚧 In Progress |
-| 4 | AI Tier 2 Expansion | 📋 Planned |
-| 5 | iOS Expansion & UI Polish | 📋 Planned |
+Aegis: Digital Shield began as a personal engineering challenge to solve a major loophole in digital habit control. Most existing accountability and blocking systems are incredibly easy to bypass—a user can simply disable a browser extension, toggle off an accessibility permission, clear data, or uninstall the app during a moment of vulnerability. 
+
+Aegis was built with a different philosophy: it is **resilient by architecture** and designed to "fight back." It integrates deep Android system permissions and custom on-device intelligence to enforce a high-commitment challenge period that cannot be bypassed or uninstalled once active.
+
+---
+
+## 🎯 What Problem It Solves
+
+Users attempting to reduce compulsive NSFW consumption often struggle during short vulnerability windows where immediate intervention and behavioural support are critical. 
+
+Existing blocker solutions frequently focus only on basic web domain filtering without addressing user behavior, app usage, emotional guidance, privacy, or proactive awareness. Aegis addresses this by:
+* **Providing real-time behavioral support** during the exact window of vulnerability.
+* **Respecting user privacy** by handling screen classification locally on-device.
+* **Eliminating easy bypass options** through a secure, self-defending native Android engine.
+
+---
+
+## 💡 The Solution
+
+Aegis combines a **React Native frontend UI** with a **Kotlin native Android engine** to build a privacy-first behavioral intervention platform:
+* **On-Device Machine Learning:** Running low-latency image classification directly on the device using TensorFlow Lite, removing the need to transmit screenshots to the cloud.
+* **Deep OS Level Integration:** Using Android's accessibility tree and administrative permissions to detect and intercept bypass settings screens across multiple OEM implementations.
+* **High-Commitment Lockdowns:** Instantly suspending offending applications and triggering inescapable overlays when triggers are detected, breaking the loop of compulsive consumption.
+
+---
+
+## 📱 App UI Showcase
+> A visual preview of the Aegis React Native interfaces (Onboarding, Active Dashboard, and the Inescapable Lockdown interface).
+
+| Onboarding & Login | Challenge Status Dashboard | Inescapable Lockdown Countdown |
+|:---:|:---:|:---:|
+| `[Place Login Mockup Here]` <br> *High-fidelity UI showing uninstall warning notifications.* | `[Place Dashboard Mockup Here]` <br> *Dynamic challenge tracking with custom duration selector.* | `[Place Lockdown Preview Here]` <br> *High-fidelity simulation of the inescapable overlay.* |
 
 ---
 
 ## 🏗️ System Architecture
 
-The following diagram shows how the three major layers of Aegis communicate with each other at runtime:
+The Aegis system architecture represents a hybrid mobile-and-backend footprint. The native Android layer uses low-latency local resources for real-time monitoring and blocking, while the FastAPI backend handles non-sensitive user metadata, session coordination, and configuration syncing.
+
+### System Architecture Diagram
+<p align="center">
+  <img src="assets/architecture-diagram.png" width="1000" alt="Aegis System Architecture Diagram" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+
+### Runtime Data Flow
+The following diagram shows how the React Native UI, native Kotlin services, TensorFlow Lite classifier, and FastAPI backend coordinate during runtime:
 
 ```mermaid
 graph TD
-    subgraph UI_Layer ["📱 UI Layer (React Native)"]
-        A[User Sets Challenge] --> B[DeviceAdminModule]
-        B --> C[Requests Device Admin Privilege]
+    %% Styling Definition
+    classDef device fill:#1c1c1e,stroke:#30d158,stroke-width:2px,color:#ffffff;
+    classDef service fill:#2c2c2e,stroke:#0a84ff,stroke-width:1.5px,color:#ffffff;
+    classDef ai fill:#3a225c,stroke:#bf5af2,stroke-width:1.5px,color:#ffffff;
+    classDef backend fill:#2c2c2e,stroke:#ff9f0a,stroke-width:1.5px,color:#ffffff;
+    classDef db fill:#1c1c12,stroke:#ff453a,stroke-width:2px,color:#ffffff;
+
+    %% Nodes configuration
+    subgraph Client ["📱 Android Device (Kotlin Client)"]
+        UI["React Native UI Layer<br/>(Dashboard & Onboarding)"]:::device
+        
+        subgraph NativeService ["🛡️ Native Aegis Engine"]
+            Watchdog["Accessibility Service<br/>(Observes UI Nodes & Window Events)"]:::service
+            Filter["Aegis Detection Service<br/>(Background Screenshotter)"]:::service
+            Slicer["8-Region Multi-Crop Slicer"]:::ai
+            TFLite["TensorFlow Lite Engine<br/>(On-device Image Classifier)"]:::ai
+            Enforcer["Shield Enforcement Layer<br/>(Back-Tap / Redirect Handler)"]:::service
+            SelfDefense["Self-Defense Controller<br/>(Settings Screen Interceptor)"]:::service
+        end
     end
 
-    subgraph Native_Layer ["⚙️ Native Android Layer (Kotlin)"]
-        D[AegisAccessibilityService] --> E{Event Router}
-        E -->|Settings Package| F["🛡️ handleSelfDefense()\n OEM Multi-Pattern Matcher"]
-        E -->|Browser/App Package| G[checkForBadUrls\nText & URL Scanner]
-        E -->|Timer Pulse| H["scanScreenContent()\nScreenshot Capture"]
-
-        H --> I[AegisDetectionService\nTensorFlow Lite Engine]
-        I --> J{AI Score Check}
-        J -->|Score > 0.7| K["🔥 NSFW Detected\n(Broadcast Block)"]
-        J -->|Score = 0.0 + Text Match| L["🔥 Incognito Detected\n(Nuke Sequence)"]
-
-        G -->|Nuclear Keyword Found| M[Request Strict Verification]
-        M --> H
+    subgraph Cloud ["☁️ AWS Cloud Backend"]
+        API["FastAPI Web API Gateway<br/>(JWT Verification & Data Validation)"]:::backend
+        OAuth["Google OAuth Service"]:::backend
+        DB[("PostgreSQL Database<br/>(Accounts, Sessions, Violation Logs)")]:::db
     end
 
-    subgraph Block_Engine ["🔒 Block Engine"]
-        K --> N[blockApp]
-        L --> N
-        N --> O{Is Browser?}
-        O -->|Yes - Normal Tab| P[about:blank → Home → Suspend]
-        O -->|Yes - Incognito| Q[4× Back → about:blank → Home → Suspend]
-        O -->|No - Regular App| R[4× Back → Home → Suspend]
-
-        F --> S[3× Back → Home\nNo Penalty Applied]
-    end
-
-    subgraph Backend ["☁️ Backend (FastAPI + PostgreSQL)"]
-        T[Auth: Google OAuth / Email+JWT]
-        U[Challenge State Sync]
-        V[Progress & Streak Tracking]
-    end
-
-    B --> T
-    A --> U
+    %% Flow lines
+    UI -.->|Configures| Watchdog
+    Watchdog -->|Triggers Screen Capture| Filter
+    Filter -->|Extracts Frame| Slicer
+    Slicer -->|Sends 8 Crops| TFLite
+    TFLite -->|Returns NSFW Score| Enforcer
+    Watchdog -->|Detects Settings Bypass| SelfDefense
+    
+    SelfDefense -->|Injects Back-Taps / Silently Redirects| UI
+    Enforcer -->|Injects about:blank & Sends Home| UI
+    
+    UI <===>|HTTPS REST + JWT Auth| API
+    API <--->|Validates Auth| OAuth
+    API <--->|CRUD Operations| DB
 ```
 
 ---
@@ -238,12 +290,12 @@ The private repository is organized with dedicated branches and GitHub Project B
 
 ## 👤 About the Developer
 
-**Yahya ZE Salman**
+**Yahya ZE Salman**  
 Back-End Developer | AI/ML Developer | Cyber Security Seeker
 
 This project represents a full-stack, cross-discipline engineering challenge — combining mobile UI, native Android development, on-device machine learning, REST API design, and security hardening into a single production-grade application.
 
-📬 **Interested in the full source code or a deeper walkthrough?**
+📬 **Interested in the full source code or a deeper walkthrough?**  
 Reach out via GitHub: [@yzes95](https://github.com/yzes95)
 
 ---
