@@ -105,7 +105,7 @@ flowchart TB
     %% Subgraphs
     subgraph Client ["📱 Android Client Device"]
         subgraph UI ["UI Layer (React Native)"]
-            R_Auth["Authentication Screens"]:::ui
+            R_Auth["Authentication Screens<br/>(Landing, Sign-In, Sign-Up, Verification)"]:::ui
             R_Dash["Challenge & Progress Dashboard"]:::ui
             R_Settings["Settings Screen"]:::ui
         end
@@ -133,7 +133,7 @@ flowchart TB
             B_User["User Service"]:::backend
             B_Challenge["Challenge State Service"]:::backend
             B_Progress["Progress & Streak Service"]:::backend
-            B_Analytics["Analytics Service"]:::backend
+            B_Email["Email Service<br/>(Resend API Caller)"]:::backend
         end
 
         subgraph Database_Layer ["Database Layer"]
@@ -143,7 +143,7 @@ flowchart TB
 
     subgraph Ext_Services ["🔌 External Services"]
         Ext_Google["Google OAuth API"]:::external
-        Ext_Firebase["Firebase Cloud Messaging<br/>(Notifications)"]:::external
+        Ext_Resend["Resend Email API"]:::external
         Ext_Gemini["Gemini API<br/>(AI Coach)"]:::external
     end
 
@@ -178,7 +178,7 @@ flowchart TB
 
     %% Backend-External Flow
     B_Auth <--->|Verify Tokens| Ext_Google
-    B_Analytics -.->|Send Tokens/Logs| Ext_Firebase
+    B_Email -.->|Send Verification Mail| Ext_Resend
     B_Challenge <--->|Habit Advice Requests| Ext_Gemini
 
     %% CI/CD flow
