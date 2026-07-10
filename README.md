@@ -21,6 +21,7 @@
 * [💡 The Solution](#-the-solution)
 * [📱 App UI Showcase](#-app-ui-showcase)
 * [🏗️ System Architecture](#%EF%B8%8F-system-architecture)
+* [🔄 Application Workflow](#-application-workflow)
 * [🧠 What I Learned](#-what-i-learned)
 * [⚙️ Technical Highlights](#%EF%B8%8F-technical-highlights)
 * [🧪 Testing & TDD Strategy](#-testing--tdd-strategy)
@@ -90,78 +91,19 @@ The Aegis system architecture represents a hybrid client-server model. The clien
 ### High-Level System Architecture Diagram
 The following diagram highlights the system boundaries, containerized environments, database storage, external API dependencies, and the DevOps pipeline:
 
-```mermaid
-flowchart TB
-    %% Styling Definition
-    classDef device fill:#1c1c1e,stroke:#30d158,stroke-width:2px,color:#ffffff;
-    classDef ui fill:#2c2c2e,stroke:#0a84ff,stroke-width:1.5px,color:#ffffff;
-    classDef native fill:#2c2c2e,stroke:#30d158,stroke-width:1.5px,color:#ffffff;
-    classDef ai fill:#1c1c1e,stroke:#bf5af2,stroke-width:2px,color:#ffffff;
-    classDef backend fill:#2c2c2e,stroke:#ff9f0a,stroke-width:1.5px,color:#ffffff;
-    classDef db fill:#1c1c12,stroke:#ff453a,stroke-width:2px,color:#ffffff;
-    classDef external fill:#121214,stroke:#64748b,stroke-width:1.5px,color:#ffffff;
-    classDef pipeline fill:#121214,stroke:#14b8a6,stroke-width:1.5px,color:#ffffff;
+<p align="center">
+  <img src="assets/System_Architecture.png" width="1000" alt="Aegis System Architecture Diagram" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
 
-    %% Subgraphs
-    subgraph Client ["📱 Android Client Device"]
-        subgraph UI ["UI Layer (React Native)"]
-            R_Auth["Authentication Screens<br/>(Landing, Sign-In, Sign-Up, Verification)"]:::ui
-            R_Dash["Challenge & Progress Dashboard"]:::ui
-            R_Settings["Settings Screen"]:::ui
-        end
+---
 
-        subgraph Kotlin ["Native Android Layer (Kotlin Engine)"]
-            K_Access["Accessibility Service"]:::native
-            K_Capture["Screen Capture Module"]:::native
-            K_Scanner["URL/Text Scanner"]:::native
-            K_Admin["Device Policy Manager<br/>(Device Admin API)"]:::native
-            K_Block["Native App Suspension Engine"]:::native
-        end
+## 🔄 Application Workflow
 
-        subgraph AI_Engine ["AI Detection Layer (On-Device ML)"]
-            TFLite["TensorFlow Lite Engine<br/>(Local Image Classifier)"]:::ai
-        end
-    end
+The following flowchart visualizes the dynamic, real-time runtime logic of the Aegis client-side blocking engine. It details the interaction loop between node scanning, screen captures, TensorFlow Lite AI processing, Settings bypass intercepting, and the incognito nuke sequence:
 
-    subgraph Backend_Env ["☁️ Cloud Backend (Docker Container)"]
-        subgraph FastAPI ["FastAPI Application Server"]
-            B_Auth["Auth Service<br/>(Google OAuth + JWT)"]:::backend
-            B_User["User Service"]:::backend
-            B_Challenge["Challenge State Service"]:::backend
-            B_Progress["Progress & Streak Service"]:::backend
-            B_Email["Email Service (Resend API)"]:::backend
-        end
-
-        subgraph Database_Layer ["Database Layer"]
-            Postgres[("PostgreSQL Database")]:::db
-        end
-    end
-
-    subgraph Ext_Services ["🔌 External Services"]
-        Ext_Google["Google OAuth API"]:::external
-        Ext_Resend["Resend Email API"]:::external
-        Ext_Gemini["Gemini API (AI Coach)"]:::external
-    end
-
-    subgraph CI_CD ["⚙️ DevOps Pipeline"]
-        GA_Pipeline["GitHub Actions CI/CD"]:::pipeline
-    end
-
-    %% Structural Communication & Interfaces
-    UI <==>|React Native Native Module Bridge| Kotlin
-    Kotlin ===>|JNI / Local Inference Call| AI_Engine
-    UI <==>|HTTPS REST API + JWT Bearer Auth| FastAPI
-    FastAPI <==>|SQLAlchemy SQL Connection| Postgres
-
-    %% External Interface Connections
-    B_Auth <--->|HTTPS Token Validation| Ext_Google
-    B_Email -.->|HTTPS Email Delivery| Ext_Resend
-    B_Challenge <--->|HTTPS NLP Queries| Ext_Gemini
-
-    %% CI/CD build & deployment boundaries
-    GA_Pipeline -.->|Build & Verify Native Binaries| Client
-    GA_Pipeline -.->|Deploy Containerized API Image| Backend_Env
-```
+<p align="center">
+  <img src="assets/App_WorkFlow.png" width="1000" alt="Aegis Application Workflow Diagram" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
 
 ---
 
