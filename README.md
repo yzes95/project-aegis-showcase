@@ -1,5 +1,5 @@
 # 🛡️ Aegis: Digital Shield
-### *An intelligent, AI-powered Android accountability app — built to help users break free from porn addiction.*
+### *An intelligent, AI-powered Android accountability app built to help users break free from porn addiction.*
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
@@ -35,7 +35,7 @@
 
 ## 📌 Project Overview
 
-Aegis: Digital Shield is a **high-commitment Android accountability application** built for users who want real, inescapable control over their digital habits. Unlike simple blocklists or browser filters that can be disabled in seconds, Aegis is designed to be **resilient by architecture** — it fights back.
+Aegis: Digital Shield is a **high-commitment Android accountability application** built for users who want real, inescapable control over their digital habits. Unlike simple blocklists or browser filters that can be disabled in seconds, Aegis is designed to be **resilient by architecture** it fights back.
 
 ### The Three Core Pillars
 
