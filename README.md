@@ -1,5 +1,5 @@
 # 🛡️ Aegis: Digital Shield
-### *An intelligent, privacy-first, AI-powered cross-platform accountability system — Android & Windows Desktop.*
+### *An intelligent, privacy-first, AI-powered cross-platform accountability system for Android & Windows Desktop.*
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Android_%7C_Windows-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/TensorFlow_Lite-On--Device_AI-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white"/>
 </p>
 
-> ⚠️ **Note:** The full active codebase is organized into dedicated private repositories (`Anti_Nude_NSFW_Backend`, `Anti_Nude_NSFW_Mobile`, `Anti_Nude_NSFW_Windows`). This showcase repository documents the multi-platform architecture, technical highlights, SDLC, and engineering decisions for portfolio evaluation.
+> **Note:** The full active codebase is organized into dedicated private repositories (`Anti_Nude_NSFW_Backend`, `Anti_Nude_NSFW_Mobile`, `Anti_Nude_NSFW_Windows`). This showcase repository documents the multi-platform architecture, technical highlights, skills learned, and engineering decisions for portfolio evaluation.
 
 ---
 
@@ -76,7 +76,7 @@ graph TD
 
 ## ⚙️ Key Technical Highlights Across Modules
 
-### 🧠 1. On-Device AI — 2-Tier Dynamic Routing & Multi-Crop Engine
+### 🧠 1. On-Device AI: 2-Tier Dynamic Routing & Multi-Crop Engine
 To preserve absolute privacy and achieve low latency, screen data is analyzed locally without streaming video or frames to the cloud.
 
 * **21-Crop Sentinel Classifier:** Slices full-screen captures into 21 distinct spatial regions (center focal zone, 4 quadrants, grid sections, and banner zones) to catch isolated explicit thumbnails.
@@ -87,7 +87,7 @@ To preserve absolute privacy and achieve low latency, screen data is analyzed lo
 
 ### 🛡️ 2. Windows Desktop Self-Defense & DACL Process Protection
 * **C# .NET WPF & Win32 Interoperability:** Low-level process enumeration and window title inspection via native Win32 APIs.
-* **Mutual Watchdog Revival:** Dual-process watchdog architecture where parent and child processes monitor each other’s health; if either process is forcibly terminated, the surviving process immediately re-spawns it.
+* **Mutual Watchdog Revival:** Dual-process watchdog architecture where parent and child processes monitor each other's health; if either process is forcibly terminated, the surviving process immediately re-spawns it.
 * **Process DACL Access Locks:** Applies restrictive Win32 Discretionary Access Control Lists (DACLs) to process handles, blocking `TerminateProcess` calls from non-system tools.
 * **Minimal Restriction Scaler:** Features a dynamic sensitivity slider backed by a strict safety floor and live preview mode.
 
@@ -101,8 +101,29 @@ To preserve absolute privacy and achieve low latency, screen data is analyzed lo
 ---
 
 ### ⚡ 4. Agent-Directed Engineering & Accelerated Velocity
-* **AI Coding Agent Integration:** Directed AI agents (such as Antigravity / Gemini) as targeted execution tools to implement verbose C# Win32 P/Invoke wrappers and Kotlin Android boilerplate.
-* **Delivery Velocity:** Accelerated cross-platform feature delivery by approximately **3x** while maintaining manual code review, refactoring, and strict architectural control.
+* **AI Coding Agent Integration:** Directed AI agents as targeted execution tools to implement verbose C# Win32 P/Invoke wrappers and Kotlin Android boilerplate.
+* **Delivery Velocity:** Accelerated cross-platform feature delivery by approximately 3x while maintaining manual code review, refactoring, and strict architectural control.
+
+---
+
+## 🎓 Skills Learned & Engineering Outcomes
+
+Building Aegis across three distinct native and cloud repositories provided deep engineering experience across multiple disciplines:
+
+### 1. Advanced Native OS Interoperability & Process Control
+* Learned low-level Win32 P/Invoke APIs in C# to manage security descriptors, DACL access tokens, process handles, and dual-process watchdog mechanisms.
+* Mastered Android Accessibility Service lifecycle, window state inspection, and OEM-specific activity routing across various Android skins (Samsung, Xiaomi, OnePlus).
+
+### 2. Privacy-First Machine Learning Deployment
+* Architected on-device inference pipelines with TensorFlow Lite, MobileNetV2, OpenNSFW2, and WD14 Tagger, ensuring sensitive user data remains 100% offline.
+* Designed multi-crop spatial algorithms (21 crops) and single-pass decision trees to minimize latency while keeping false positives below 4%.
+
+### 3. Production REST Backend & Test-Driven Development (TDD)
+* Implemented modular REST APIs using FastAPI, PostgreSQL, Google OAuth 2.0 authentication, and JWT token rotation.
+* Enforced code quality and reliability through automated PyTest suites covering auth logic, token renewal, and database state transitions.
+
+### 4. Cross-Platform System Design & JSON Data Contracts
+* Established clean JSON data contracts decoupling frontend React Native interfaces from native C# desktop services, Android Kotlin background hooks, and FastAPI backend servers.
 
 ---
 
@@ -137,4 +158,4 @@ GitHub: [@yzes95](https://github.com/yzes95) | Portfolio: [yahya-porto.onrender.
 
 ---
 
-<p align="center"><sub>🛡️ Aegis: Digital Shield — Privacy-First Engineering.</sub></p>
+<p align="center"><sub>🛡️ Aegis: Digital Shield - Privacy-First Engineering.</sub></p>
